@@ -206,7 +206,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.72, 0.8, 0.75)
 theme_override_font_sizes/font_size = 11
 text = "[WASD] Ходьба • [Shift] Бег • [Ctrl] Присед
-[F] Фонарь • [Q] Сонар • [E] Осмотр • [F11] Экран"
+[ЛКМ] Дробовик • [R] Перезарядка • [F] Фонарь • [Q] Сонар • [E] Осмотр"
 horizontal_alignment = 2
 
 [node name="NoteContainer" type="CenterContainer" parent="Player/HUD"]

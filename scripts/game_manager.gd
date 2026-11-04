@@ -1,13 +1,13 @@
 extends Node
 
 # Autoload: Game
-# Менеджер игрового состояния, питания города и найденных артефактов
+# Менеджер игрового состояния, аккумулятора, дневников и питания города
 
 signal note_opened(title: String, content: String)
 signal note_closed
-signal power_restored(generator_index: int, total_generators: int)
-signal scanner_triggered(origin: Vector3)
+signal power_restored(generator_index: int, total: int)
 signal battery_changed(current: float, max_val: float)
+signal toast(text: String)
 
 var battery_energy: float = 100.0
 var max_battery: float = 100.0
@@ -17,7 +17,6 @@ var is_note_open: bool = false
 var notes_found: Array[String] = []
 
 func _process(delta: float) -> void:
-	# Пассивная подзарядка аккумулятора со временем, если выключен фонарь
 	if battery_energy < max_battery:
 		battery_energy = min(max_battery, battery_energy + delta * 2.5)
 		battery_changed.emit(battery_energy, max_battery)

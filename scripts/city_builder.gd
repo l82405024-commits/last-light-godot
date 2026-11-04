@@ -1,9 +1,10 @@
 extends Node3D
 
 # Процедурный генератор заброшенного мегаполиса:
-# Небоскребы, разрушенные эстакады, заросшие дворы, генераторы и записки выживших
+# Небоскребы, разрушенные эстакады, заросшие дворы, генераторы, записки и зомби-мутанты
 
 const InteractiveObjScript = preload("res://scripts/interactive_object.gd")
+const ZombieScene = preload("res://scenes/zombie.tscn")
 
 @export var city_grid_size: int = 6 # 6x6 кварталов
 @export var block_size: float = 24.0 # Размер одного городского квартала
@@ -23,9 +24,9 @@ func _ready() -> void:
 	_build_ground()
 	_generate_city_blocks()
 	_spawn_landmarks_and_lore()
+	_spawn_zombie_horde()
 
 func _build_ground() -> void:
-	# Главная плоскость земли с шейдером потрескавшегося асфальта и луж
 	var plane_mesh = PlaneMesh.new()
 	var total_size = float(city_grid_size) * (block_size + street_width) + 60.0
 	plane_mesh.size = Vector2(total_size, total_size)
@@ -40,7 +41,6 @@ func _build_ground() -> void:
 		mat.shader = ground_shader
 		ground_inst.material_override = mat
 
-	# Статическое тело для коллизии с землей
 	var static_body = StaticBody3D.new()
 	var col_shape = CollisionShape3D.new()
 	var box = BoxShape3D.new()
@@ -60,7 +60,6 @@ func _generate_city_blocks() -> void:
 			var bx = float(gx) * (block_size + street_width) - offset + block_size * 0.5
 			var bz = float(gz) * (block_size + street_width) - offset + block_size * 0.5
 
-			# В центральном квартале оставляем площадь для старта игрока
 			if gx == city_grid_size / 2 and gz == city_grid_size / 2:
 				_build_central_plaza(Vector3(bx, 0, bz))
 				continue
@@ -72,7 +71,6 @@ func _build_block(pos: Vector3, seed_val: int) -> void:
 	block_node.position = pos
 	add_child(block_node)
 
-	# Случайная конфигурация: 1 мега-небоскреб или 4 средних здания
 	var r = (seed_val % 10) / 10.0
 	if r > 0.45:
 		var height = 35.0 + float(seed_val % 40)
@@ -133,7 +131,7 @@ func _build_central_plaza(pos: Vector3) -> void:
 	_create_interactive_note(
 		pos + Vector3(2.5, 1.5, 0.5),
 		"Дневник выжившего: Запись #1",
-		"Город опустел за считанные часы. Туман пришел с залива и заглушил все частоты.\nЧтобы включить эвакуационную антенну, нужно восстановить 3 генератора в кварталах вокруг площади. Нажми [Q] для сканирования местности."
+		"Город опустел за считанные часы. Туман пришел с залива и заглушил все частоты.\nЧтобы включить эвакуационную антенну, нужно восстановить 3 генератора в кварталах вокруг площади. Нажми [Q] для сканирования местности.\nОсторожно: в темноте бродят зараженные! Стреляй из дробовика на [ЛКМ], перезарядка на [R]."
 	)
 
 func _spawn_landmarks_and_lore() -> void:
@@ -157,6 +155,28 @@ func _spawn_landmarks_and_lore() -> void:
 		"Финальное сообщение: Сигнал SOS",
 		"Все три подстанции соединены в единую сеть. Как только будет запущен последний сектор, сияние города пробьет пелену на многие километры."
 	)
+
+func _spawn_zombie_horde() -> void:
+	# Спавним пачки зомби на ключевых улицах и переулках
+	var spawn_positions = [
+		Vector3(22.0, 0.5, 16.0),
+		Vector3(36.0, 0.5, 20.0),
+		Vector3(28.0, 0.5, -18.0),
+		Vector3(-18.0, 0.5, 35.0),
+		Vector3(-25.0, 0.5, 42.0),
+		Vector3(-8.0, 0.5, 55.0),
+		Vector3(-38.0, 0.5, -16.0),
+		Vector3(-48.0, 0.5, -30.0),
+		Vector3(12.0, 0.5, -42.0),
+		Vector3(-22.0, 0.5, -38.0),
+		Vector3(42.0, 0.5, -5.0),
+		Vector3(-35.0, 0.5, 12.0)
+	]
+
+	for pos in spawn_positions:
+		var z = ZombieScene.instantiate()
+		z.position = pos
+		add_child(z)
 
 func _create_interactive_note(pos: Vector3, title: String, text: String) -> void:
 	var note_area = Area3D.new()

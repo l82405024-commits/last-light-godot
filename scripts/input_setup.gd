@@ -1,7 +1,7 @@
 extends Node
 
 # Autoload: GameInput
-# Настройка управления по умолчанию, если действия отсутствуют в InputMap
+# Настройка управления по умолчанию
 
 func _ready() -> void:
 	_ensure_action("move_forward", [KEY_W, KEY_UP])
@@ -14,6 +14,8 @@ func _ready() -> void:
 	_ensure_action("flashlight", [KEY_F])
 	_ensure_action("scan", [KEY_Q])
 	_ensure_action("interact", [KEY_E])
+	_ensure_action("reload", [KEY_R])
+	_ensure_mouse_action("shoot", MOUSE_BUTTON_LEFT)
 	_ensure_action("toggle_fullscreen", [KEY_F11])
 	_ensure_action("pause", [KEY_ESCAPE])
 
@@ -24,6 +26,13 @@ func _ensure_action(action_name: StringName, default_keys: Array) -> void:
 			var event = InputEventKey.new()
 			event.physical_keycode = k
 			InputMap.action_add_event(action_name, event)
+
+func _ensure_mouse_action(action_name: StringName, button_index: MouseButton) -> void:
+	if not InputMap.has_action(action_name):
+		InputMap.add_action(action_name)
+		var event = InputEventMouseButton.new()
+		event.button_index = button_index
+		InputMap.action_add_event(action_name, event)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_fullscreen"):
