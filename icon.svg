@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08131a"/>
+      <stop offset="0.62" stop-color="#173440"/>
+      <stop offset="1" stop-color="#c97b45"/>
+    </linearGradient>
+    <linearGradient id="tower" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1418"/>
+      <stop offset="1" stop-color="#050a0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="22" fill="url(#sky)"/>
+  <circle cx="92" cy="52" r="16" fill="#ffb066" opacity="0.55"/>
+  <circle cx="92" cy="52" r="8" fill="#ffd7a0"/>
+  <path d="M10 116V54h18v62M30 116V42h20v74M54 116V66h16v50M74 116V30h22v86M100 116V62h18v54" fill="url(#tower)"/>
+  <path d="M33 50h14M33 60h14M33 70h14M77 40h16M77 50h16M77 60h16M77 70h16" stroke="#ffb35c" stroke-width="2" opacity="0.75"/>
+  <path d="M30 44h20v6H30zM74 32h22v6H74z" fill="#66e0ff" opacity="0.85"/>
+  <path d="M8 118h112" stroke="#66e0ff" stroke-width="2" opacity="0.45"/>
+</svg>

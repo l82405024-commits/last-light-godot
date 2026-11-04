@@ -1,0 +1,251 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/city_builder.gd" id="1_city"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="2_player"]
+[ext_resource type="Script" path="res://scripts/sound_synth.gd" id="3_synth"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.04, 0.06, 0.1, 1)
+sky_horizon_color = Color(0.09, 0.14, 0.2, 1)
+ground_bottom_color = Color(0.02, 0.03, 0.05, 1)
+ground_horizon_color = Color(0.08, 0.12, 0.18, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 3
+ambient_light_color = Color(0.12, 0.18, 0.25, 1)
+ambient_light_energy = 0.65
+tonemap_mode = 2
+ssao_enabled = true
+glow_enabled = true
+glow_bloom = 0.28
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.035
+volumetric_fog_albedo = Color(0.55, 0.75, 0.9, 1)
+volumetric_fog_emission = Color(0.04, 0.09, 0.15, 1)
+volumetric_fog_emission_energy = 1.2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
+bg_color = Color(0.06, 0.09, 0.14, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.75, 1, 0.6)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 50, 0)
+light_color = Color(0.68, 0.82, 1, 1)
+light_energy = 1.6
+shadow_enabled = true
+directional_shadow_max_distance = 120.0
+volumetric_fog_energy = 1.8
+
+[node name="CityBuilder" type="Node3D" parent="."]
+script = ExtResource("1_city")
+
+[node name="Player" type="CharacterBody3D" parent="." node_paths=PackedStringArray("prompt_label", "battery_bar", "scanner_bar", "note_panel", "note_title_lbl", "note_content_lbl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+script = ExtResource("2_player")
+prompt_label = NodePath("HUD/CenterContainer/PromptLabel")
+battery_bar = NodePath("HUD/BottomLeft/BatteryBar")
+scanner_bar = NodePath("HUD/BottomLeft/ScannerBar")
+note_panel = NodePath("HUD/NoteContainer")
+note_title_lbl = NodePath("HUD/NoteContainer/NoteBox/VBox/TitleLabel")
+note_content_lbl = NodePath("HUD/NoteContainer/NoteBox/VBox/ContentLabel")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CameraPivot" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
+current = true
+fov = 75.0
+
+[node name="Flashlight" type="SpotLight3D" parent="Player/CameraPivot/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.15, -0.1)
+light_color = Color(1, 0.96, 0.86, 1)
+light_energy = 3.6
+shadow_enabled = true
+spot_range = 35.0
+spot_angle = 32.0
+spot_angle_attenuation = 1.2
+
+[node name="InteractRay" type="RayCast3D" parent="Player/CameraPivot/Camera3D"]
+target_position = Vector3(0, 0, -3.2)
+collision_mask = 2
+collide_with_areas = true
+collide_with_bodies = false
+
+[node name="SoundSynth" type="Node" parent="Player"]
+script = ExtResource("3_synth")
+
+[node name="HUD" type="CanvasLayer" parent="Player"]
+
+[node name="Crosshair" type="CenterContainer" parent="Player/HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dot" type="ColorRect" parent="Player/HUD/Crosshair"]
+custom_minimum_size = Vector2(4, 4)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.75)
+
+[node name="CenterContainer" type="CenterContainer" parent="Player/HUD"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = 40.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PromptLabel" type="Label" parent="Player/HUD/CenterContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.85, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_font_sizes/font_size = 18
+text = "[E] Взаимодействовать"
+
+[node name="BottomLeft" type="VBoxContainer" parent="Player/HUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -110.0
+offset_right = 260.0
+offset_bottom = -24.0
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="BatteryLabel" type="Label" parent="Player/HUD/BottomLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "АККУМУЛЯТОР ФОНАРЯ [F]"
+
+[node name="BatteryBar" type="ProgressBar" parent="Player/HUD/BottomLeft"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ScannerLabel" type="Label" parent="Player/HUD/BottomLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "СОНАР-СКАНЕР ГОРОДА [Q]"
+
+[node name="ScannerBar" type="ProgressBar" parent="Player/HUD/BottomLeft"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="TopRight" type="VBoxContainer" parent="Player/HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -340.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 140.0
+grow_horizontal = 0
+
+[node name="CityTitle" type="Label" parent="Player/HUD/TopRight"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.95)
+theme_override_font_sizes/font_size = 18
+text = "ПОСЛЕДНИЙ СВЕТ • ЗАБРОШЕННЫЙ ГОРОД"
+horizontal_alignment = 2
+
+[node name="TaskInfo" type="Label" parent="Player/HUD/TopRight"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.8, 1, 0.9)
+theme_override_font_sizes/font_size = 13
+text = "Цель: восстановить 3 генератора питания"
+horizontal_alignment = 2
+
+[node name="ControlsInfo" type="Label" parent="Player/HUD/TopRight"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.8, 0.75)
+theme_override_font_sizes/font_size = 11
+text = "[WASD] Ходьба • [Shift] Бег • [Ctrl] Присед
+[F] Фонарь • [Q] Сонар • [E] Осмотр • [F11] Экран"
+horizontal_alignment = 2
+
+[node name="NoteContainer" type="CenterContainer" parent="Player/HUD"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NoteBox" type="PanelContainer" parent="Player/HUD/NoteContainer"]
+custom_minimum_size = Vector2(560, 320)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="VBox" type="VBoxContainer" parent="Player/HUD/NoteContainer/NoteBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="Player/HUD/NoteContainer/NoteBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.88, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Забытый дневник"
+
+[node name="HSeparator" type="HSeparator" parent="Player/HUD/NoteContainer/NoteBox/VBox"]
+layout_mode = 2
+
+[node name="ContentLabel" type="Label" parent="Player/HUD/NoteContainer/NoteBox/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.92, 0.94, 0.97, 1)
+theme_override_font_sizes/font_size = 15
+text = "Текст записки..."
+autowrap_mode = 2
+
+[node name="CloseHint" type="Label" parent="Player/HUD/NoteContainer/NoteBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "[Нажмите E, Пробел или ESC чтобы закрыть]"
+horizontal_alignment = 2
